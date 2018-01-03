@@ -1,0 +1,8 @@
+
+Reading audio files to audio data:
+https://pypi.python.org/pypi/audioread/2.1.4
+amplifying audio files:
+https://github.com/russellcardullo/python-dsp/blob/master/amplify.py
+
+high level audio interface
+http://pydub.com/
