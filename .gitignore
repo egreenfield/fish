@@ -1,1 +1,4 @@
 __pycache__
+output/*.mp3
+output/*.wav
+**/.DS_Store
