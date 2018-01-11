@@ -19,7 +19,7 @@ export class Listener {
             await this.queuePromise;
         }
         let result = await this.sqs.receiveMessage({
-            WaitTimeSeconds:3,
+//            WaitTimeSeconds:3,
             QueueUrl:this.queueUrl
         }).promise();
         

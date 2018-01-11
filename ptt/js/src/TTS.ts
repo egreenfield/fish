@@ -12,7 +12,6 @@ export class TTS {
 	fetchAudio(options:{message:string;output:string}):Promise<void> {
 		console.log("saving message to",options.output);
 		return this.polly.synthesizeSpeech({OutputFormat:"mp3",Text:options.message,VoiceId:"Brian"}).promise().then((data) => {
-			console.log("response is ",data);
 			return new Promise<void>((resolve,reject) => {
 				writeFile(options.output,data.AudioStream,{},(err) => {
 					if(err) return reject(err);

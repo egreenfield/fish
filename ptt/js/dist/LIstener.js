@@ -56,7 +56,7 @@ var Listener = /** @class */ (function () {
                         _a.sent();
                         _a.label = 2;
                     case 2: return [4 /*yield*/, this.sqs.receiveMessage({
-                            WaitTimeSeconds: 3,
+                            //            WaitTimeSeconds:3,
                             QueueUrl: this.queueUrl
                         }).promise()];
                     case 3:

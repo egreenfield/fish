@@ -11,7 +11,6 @@ var TTS = /** @class */ (function () {
     TTS.prototype.fetchAudio = function (options) {
         console.log("saving message to", options.output);
         return this.polly.synthesizeSpeech({ OutputFormat: "mp3", Text: options.message, VoiceId: "Brian" }).promise().then(function (data) {
-            console.log("response is ", data);
             return new Promise(function (resolve, reject) {
                 fs_1.writeFile(options.output, data.AudioStream, {}, function (err) {
                     if (err)
