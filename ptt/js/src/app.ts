@@ -16,23 +16,39 @@ function reportError(err:Error) {
 }
 
 async function sayMessage(message:string) {
+	console.log("fetching speech");
 	await fetcher.fetchAudio({message,output:rawFile});
+	console.log("transforming audio");
 	await xform.transform({input:rawFile,output:xformedFile});		
 }
 
 
-async function listen() {
-	let messages = await listener.listen();
+async function listenOnce() {
+	let messages = await listener.listenOnce();
 	for(let i=0;i<messages.length;i++) {
 		console.log(`processing message ${messages[i]}`);
 		await sayMessage(messages[i]);
 	}
 	return messages.length;
 }
-listen().then((len)=> {
-	console.log(len,"messages processed")
-}).catch((reason) => {
-	console.log("failed with",reason);
-})
+async function processMessages(err:Error,messages:string[]) {
+	if(err) {
+		throw err;
+	}
+	for(let i=0;i<messages.length;i++) {
+		console.log(`****** processing message "${messages[i]}"`);
+		await sayMessage(messages[i]);
+		console.log("message processed");
+	}
+}
+
+// listenOnce().then((len)=> {
+// 	console.log(len,"messages processed")
+// }).catch((reason) => {
+// 	console.log("failed with",reason);
+// })
+
 
 //sayMessage("This is a test message from the other side");
+
+listener.startListening(processMessages);

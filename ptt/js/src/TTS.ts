@@ -9,16 +9,15 @@ export class TTS {
 			region: "us-west-2"
 		})
 	}
-	fetchAudio(options:{message:string;output:string}):Promise<void> {
+	async fetchAudio(options:{message:string;output:string}) {
 		console.log("saving message to",options.output);
-		return this.polly.synthesizeSpeech({OutputFormat:"mp3",Text:options.message,VoiceId:"Brian"}).promise().then((data) => {
-			return new Promise<void>((resolve,reject) => {
-				writeFile(options.output,data.AudioStream,{},(err) => {
-					if(err) return reject(err);
-					console.log("output file written");
-					resolve();		
-				});	
-			})
-		});
+		let data = await this.polly.synthesizeSpeech({OutputFormat:"mp3",Text:options.message,VoiceId:"Brian"}).promise()
+		await new Promise<void>((resolve,reject) => {
+			writeFile(options.output,data.AudioStream,{},(err) => {
+				if(err) return reject(err);
+				console.log("output file written");
+				resolve();		
+			});	
+		})
 	}
 }

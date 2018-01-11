@@ -53,9 +53,12 @@ function sayMessage(message) {
     return __awaiter(this, void 0, void 0, function () {
         return __generator(this, function (_a) {
             switch (_a.label) {
-                case 0: return [4 /*yield*/, fetcher.fetchAudio({ message: message, output: rawFile })];
+                case 0:
+                    console.log("fetching speech");
+                    return [4 /*yield*/, fetcher.fetchAudio({ message: message, output: rawFile })];
                 case 1:
                     _a.sent();
+                    console.log("transforming audio");
                     return [4 /*yield*/, xform.transform({ input: rawFile, output: xformedFile })];
                 case 2:
                     _a.sent();
@@ -64,12 +67,12 @@ function sayMessage(message) {
         });
     });
 }
-function listen() {
+function listenOnce() {
     return __awaiter(this, void 0, void 0, function () {
         var messages, i;
         return __generator(this, function (_a) {
             switch (_a.label) {
-                case 0: return [4 /*yield*/, listener.listen()];
+                case 0: return [4 /*yield*/, listener.listenOnce()];
                 case 1:
                     messages = _a.sent();
                     i = 0;
@@ -89,9 +92,37 @@ function listen() {
         });
     });
 }
-listen().then(function (len) {
-    console.log(len, "messages processed");
-}).catch(function (reason) {
-    console.log("failed with", reason);
-});
+function processMessages(err, messages) {
+    return __awaiter(this, void 0, void 0, function () {
+        var i;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    if (err) {
+                        throw err;
+                    }
+                    i = 0;
+                    _a.label = 1;
+                case 1:
+                    if (!(i < messages.length)) return [3 /*break*/, 4];
+                    console.log("****** processing message \"" + messages[i] + "\"");
+                    return [4 /*yield*/, sayMessage(messages[i])];
+                case 2:
+                    _a.sent();
+                    console.log("message processed");
+                    _a.label = 3;
+                case 3:
+                    i++;
+                    return [3 /*break*/, 1];
+                case 4: return [2 /*return*/];
+            }
+        });
+    });
+}
+// listenOnce().then((len)=> {
+// 	console.log(len,"messages processed")
+// }).catch((reason) => {
+// 	console.log("failed with",reason);
+// })
 //sayMessage("This is a test message from the other side");
+listener.startListening(processMessages);

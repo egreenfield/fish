@@ -35,16 +35,18 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+var timers_1 = require("timers");
 var Listener = /** @class */ (function () {
     function Listener(session) {
         var _this = this;
         this.session = session;
+        this.listening = false;
         this.sqs = new session.sdk.SQS({
             region: "us-west-2"
         });
         this.queuePromise = this.sqs.getQueueUrl({ QueueName: "fishTalk" }).promise().then(function (v) { _this.queueUrl = v.QueueUrl; _this.queuePromise = null; });
     }
-    Listener.prototype.listen = function () {
+    Listener.prototype.listenOnce = function () {
         return __awaiter(this, void 0, void 0, function () {
             var result, messages;
             return __generator(this, function (_a) {
@@ -61,6 +63,9 @@ var Listener = /** @class */ (function () {
                         }).promise()];
                     case 3:
                         result = _a.sent();
+                        if (this.listening == false) {
+                            return [2 /*return*/];
+                        }
                         messages = result.Messages || [];
                         if (!messages.length) return [3 /*break*/, 5];
                         return [4 /*yield*/, this.sqs.deleteMessageBatch({
@@ -74,6 +79,41 @@ var Listener = /** @class */ (function () {
                 }
             });
         });
+    };
+    Listener.prototype.checkForMessages = function () {
+        return __awaiter(this, void 0, void 0, function () {
+            var messages;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, this.listenOnce()];
+                    case 1:
+                        messages = _a.sent();
+                        return [4 /*yield*/, this.callback(null, messages)];
+                    case 2:
+                        _a.sent();
+                        this.setNextTimeout();
+                        return [2 /*return*/];
+                }
+            });
+        });
+    };
+    Listener.prototype.setNextTimeout = function () {
+        var _this = this;
+        if (this.listening) {
+            timers_1.setTimeout(function () {
+                _this.checkForMessages();
+            }, 1);
+        }
+    };
+    Listener.prototype.startListening = function (callback) {
+        if (this.listening)
+            return;
+        this.listening = true;
+        this.callback = callback;
+        this.setNextTimeout();
+    };
+    Listener.prototype.stopListening = function () {
+        this.listening = false;
     };
     return Listener;
 }());
