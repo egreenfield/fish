@@ -1,23 +1,25 @@
-import tempfile
-import os
-
-from playsound import playsound
-#from pydub import AudioSegment
+#!/usr/bin/env python3
 import pydub
+import playSoundFile
 
 
 def transform(sourceFile,destFile):
 
     # amplify
+    #print("loading")
     song = pydub.AudioSegment.from_mp3(sourceFile)
     #song = song + 13
+    print("amping")
     song = song + 5
+    print("speeding")
     song = pydub.effects.speedup(song,1.2)
+    print("writing")
     song.export(destFile, format="mp3")
  
 def testTransform():
-    transform("raw.mp3","song.mp3")
-    os.system('mpg321 -a b2 song.mp3')
+	outputFile = "../output/testTransform.mp3"
+	transform("../output/raw.mp3",outputFile)
+	#playSoundFile.play(outputFile)
 
 if __name__ == "__main__":
     testTransform()

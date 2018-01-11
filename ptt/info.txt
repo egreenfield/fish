@@ -1,3 +1,17 @@
+Todo:
+1) figure out how to run in background
+DONE 2) test bluetooth after reboot
+3) test bluetooth in headless mode
+4) test new motor board
+5) port fish code
+6) swap out arduino
+7) drill hole for reboot button
+
+
+runnning scripts on startup
+https://www.dexterindustries.com/howto/run-a-program-on-your-raspberry-pi-at-startup/
+http://www.raspberry-projects.com/pi/pi-operating-systems/raspbian/auto-running-programs
+
 
 Reading audio files to audio data:
 https://pypi.python.org/pypi/audioread/2.1.4

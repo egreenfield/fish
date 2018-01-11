@@ -1,8 +1,8 @@
+#!/usr/bin/env python3
 import boto3
-import tempfile
 import sys
-import tempfile
-import os
+import playSoundFile
+
 from transform import transform
 
 from playsound import playsound
@@ -20,8 +20,8 @@ def tts(message,outputFile):
     global polly    
 
     filesize = 0
+    print("fetching audio");
     response = polly.synthesize_speech(OutputFormat="mp3",Text=message,VoiceId="Brian");
-    print("response is",response)
     body = response['AudioStream']
     f = open(outputFile,"wb") # tempfile.NamedTemporaryFile(suffix="mp3")
 
@@ -32,7 +32,7 @@ def tts(message,outputFile):
         filesize += len(audio)
         audio = body.read(1024*1024)
         
-    print("file was ",filesize," bytes")
+    print("audio file was ",filesize," bytes")
     f.close()
 
 def say(message):
@@ -42,14 +42,11 @@ def say(message):
     outputFile = gOutputDir + "/output.mp3"
 
     tts(message,rawFile)
+    print("transforming")
     transform(rawFile,outputFile)
+    print("playing")
+    playSoundFile.play(outputFile)
 
-#    playsound(songName)
-#    os.system('mpg123 -q song.mp3 &')
-    # os.system('aplay -D bluealsa:HCI=hci0,DEV=FC:65:DE:0B:E3:2C,PROFILE=a2dp song.wav')
-    cmd = "mpg321 -a b2 " + outputFile
-    print("command is",cmd)
-    os.system(cmd)
  
 
 if __name__ == "__main__":
