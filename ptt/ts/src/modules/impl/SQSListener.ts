@@ -1,23 +1,30 @@
+import { Tools } from './../Tools';
+import { Listener } from "./LIstener";
 import { AWSSession } from "./AWSSession";
 import { SQS, Response, AWSError } from "aws-sdk";
 import { setTimeout } from "timers";
 
-export class Listener {
-    queuePromise: Promise<void>;
-    sqs : SQS;
-    queueUrl:string;
-    callback:(err:Error,messages:string[])=>Promise<void>;
-    listening = false;
-	constructor(public session:AWSSession) {
-		this.sqs = new session.sdk.SQS({	
-			region: "us-west-2"
+export class SQSListener implements Listener {
+    private queuePromise: Promise<void>;
+    private sqs : SQS;
+    private queueUrl:string;
+    private callback:(err:Error,messages:string[])=>Promise<void>;
+    private listening = false;
+
+	constructor(public tools:Tools,public session:AWSSession) {
+        this.sqs = new session.sdk.SQS({	
+			region: "us-west=mn  -2"
         })
         this.queuePromise = this.sqs.getQueueUrl({QueueName:"fishTalk"}).promise().then(
             (v) => {this.queueUrl = v.QueueUrl;this.queuePromise = null;}
         );
+    }
 
+    public init() {
+	
 	}
-    async listenOnce() {
+
+    private async retrieveMessageFromQueue() {
         if (this.queuePromise) {
             await this.queuePromise;
         }
@@ -40,19 +47,22 @@ export class Listener {
         return messages.map(v => v.Body);
     }
     
-    async checkForMessages() {
-        let messages = await this.listenOnce();
-        await this.callback(null,messages);
-        this.setNextTimeout();
+    private async checkForMessages() {
+        let messages = await this.retrieveMessageFromQueue();
+        if(this.callback) 
+            await this.callback(null,messages);
+        return messages;
     }
-    setNextTimeout() {
+
+    private setNextTimeout() {
         if(this.listening) {
             setTimeout(() => {
                 this.checkForMessages();
+                this.setNextTimeout();
             },1);
         }
     }
-    startListening(callback:(err:Error,messages:string[])=>Promise<void>) {
+    public startListening(callback:(err:Error,messages:string[])=>Promise<void>) {
         if(this.listening)
             return;
         this.listening = true;
@@ -60,7 +70,11 @@ export class Listener {
         this.setNextTimeout();
     }
     
-    stopListening() {
+    public stopListening() {
         this.listening = false;
+    }
+    async listenOnce() {
+        let messages = await this.checkForMessages();
+        return messages;        
     }
 }

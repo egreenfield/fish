@@ -12,9 +12,11 @@
   "license": "ISC",
   "dependencies": {
     "aws-sdk": "^2.179.0",
+    "commander": "^2.13.0",
     "fluent-ffmpeg": "^2.1.2"
   },
   "devDependencies": {
+    "@types/commander": "^2.12.2",
     "@types/fluent-ffmpeg": "^2.1.6",
     "@types/node": "^9.3.0",
     "typescript": "^2.6.2"
