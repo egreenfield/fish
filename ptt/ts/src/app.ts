@@ -3,11 +3,13 @@ import { AWSSession } from "./AWSSession";
 import { TTS } from "./TTS";
 import { Transformer } from "./Transformer";
 import { Listener } from "./LIstener";
+import { Speaker } from "./speaker";
 
 let session = new AWSSession();
 let fetcher = new TTS(session);
 let xform = new Transformer();
 let listener = new Listener(session);
+let speaker = new Speaker();
 
 const rawFile = "../output/rawTestOutput.mp3";
 const xformedFile = "../output/xformedTestOutput.mp3";
@@ -20,6 +22,7 @@ async function sayMessage(message:string) {
 	await fetcher.fetchAudio({message,output:rawFile});
 	console.log("transforming audio");
 	await xform.transform({input:rawFile,output:xformedFile});		
+	await speaker.speak(xformedFile);
 }
 
 

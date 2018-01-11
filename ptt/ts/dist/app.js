@@ -40,10 +40,12 @@ var AWSSession_1 = require("./AWSSession");
 var TTS_1 = require("./TTS");
 var Transformer_1 = require("./Transformer");
 var LIstener_1 = require("./LIstener");
+var speaker_1 = require("./speaker");
 var session = new AWSSession_1.AWSSession();
 var fetcher = new TTS_1.TTS(session);
 var xform = new Transformer_1.Transformer();
 var listener = new LIstener_1.Listener(session);
+var speaker = new speaker_1.Speaker();
 var rawFile = "../output/rawTestOutput.mp3";
 var xformedFile = "../output/xformedTestOutput.mp3";
 function reportError(err) {
@@ -61,6 +63,9 @@ function sayMessage(message) {
                     console.log("transforming audio");
                     return [4 /*yield*/, xform.transform({ input: rawFile, output: xformedFile })];
                 case 2:
+                    _a.sent();
+                    return [4 /*yield*/, speaker.speak(xformedFile)];
+                case 3:
                     _a.sent();
                     return [2 /*return*/];
             }
