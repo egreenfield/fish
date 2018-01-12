@@ -1,7 +1,7 @@
 import { exec } from "child_process";
 import { promisify } from "util";
-import { Tools } from "../Tools";
-import { Speaker } from "./speaker";
+import { Tools } from "../api/Tools";
+import { Speaker } from "../api/speaker";
 
 const execP = promisify(exec);
 

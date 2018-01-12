@@ -14,8 +14,8 @@ let tools = new Tools();
 let session = new AWSSession();
 tools.listener = new SQSListener(tools,session);
 tools.fetcher = new PollyTTS(tools,session);
-tools.speaker = new OSXSpeaker(tools);
 tools.transformer = new FFMpegTransformer(tools);
+tools.speaker = new OSXSpeaker(tools);
 
 tools.init();
 

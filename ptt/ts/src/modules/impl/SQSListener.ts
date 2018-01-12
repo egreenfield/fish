@@ -1,5 +1,5 @@
-import { Tools } from './../Tools';
-import { Listener } from "./LIstener";
+import { Tools } from '../api/Tools';
+import { Listener } from "../api/Listener";
 import { AWSSession } from "./AWSSession";
 import { SQS, Response, AWSError } from "aws-sdk";
 import { setTimeout } from "timers";
@@ -13,7 +13,7 @@ export class SQSListener implements Listener {
 
 	constructor(public tools:Tools,public session:AWSSession) {
         this.sqs = new session.sdk.SQS({	
-			region: "us-west=mn  -2"
+			region: "us-west-2"
         })
         this.queuePromise = this.sqs.getQueueUrl({QueueName:"fishTalk"}).promise().then(
             (v) => {this.queueUrl = v.QueueUrl;this.queuePromise = null;}
@@ -28,16 +28,19 @@ export class SQSListener implements Listener {
         if (this.queuePromise) {
             await this.queuePromise;
         }
+        console.log("starting receive");
         let result = await this.sqs.receiveMessage({
-//            WaitTimeSeconds:3,
+            WaitTimeSeconds:10,
             QueueUrl:this.queueUrl
         }).promise();
+        console.log("end receive");
     
         if(this.listening == false) {
             return;
         }
 
         let messages: SQS.Message[] = result.Messages || [];
+        console.log("received ",messages.length,"messages");
         if(messages.length) 
             await this.sqs.deleteMessageBatch( 
                 {
@@ -54,10 +57,10 @@ export class SQSListener implements Listener {
         return messages;
     }
 
-    private setNextTimeout() {
+    private  setNextTimeout() {
         if(this.listening) {
-            setTimeout(() => {
-                this.checkForMessages();
+            setTimeout(async () => {
+                await this.checkForMessages();
                 this.setNextTimeout();
             },1);
         }

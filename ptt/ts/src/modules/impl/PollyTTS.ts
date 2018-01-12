@@ -2,7 +2,7 @@ import { AWSSession } from "./AWSSession";
 import { Polly } from "aws-sdk";
 import { writeFile } from "fs";
 import { promisify } from "util";
-import { Tools } from "../Tools";
+import { Tools } from "../api/Tools";
 
 const writeFileP = promisify(writeFile);
 

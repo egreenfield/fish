@@ -33,10 +33,14 @@ export class ListenAndSay {
         if(err) {
             this.reportError(err);
         }
-        for(let i=0;i<messages.length;i++) {
-            console.log(`****** processing message "${messages[i]}"`);
-            await this.sayMessage(messages[i]);
-            console.log("message processed");
+        try {
+            for(let i=0;i<messages.length;i++) {
+                console.log(`****** processing message "${messages[i]}"`);
+                await this.sayMessage(messages[i]);
+                console.log("message processed");
+            }
+        } catch(e) {
+            this.reportError(e as Error);
         }
     }
     public start() {
