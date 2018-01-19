@@ -10,13 +10,13 @@ import * as cc from "cli-chart";
 //-------------------------------------------------------------------------------------------
 //TODO check sound in pin
 const SoundInPin = "A0";
-
+const kInterval = 2;
 let five_:any = five;
 let board: five.Board;
 let led:any;
 
 let report:boolean = false;
-
+let autoreport:boolean = false;
 let domain:{min:number;max:number} = {min:Infinity,max:-Infinity};
 let speaker:Speaker;
 let fishDriver:FishDriver;
@@ -74,7 +74,7 @@ function init() {
             s: () => {
                 report = !report;
             },
-            reset: () => {
+            r: () => {
                 domain = {min:Infinity,max:-Infinity}
             },
             stats: () => {
@@ -82,6 +82,9 @@ function init() {
             },
             p: () => {
               fishDriver.stop();
+            },
+            autoreport: () => {
+              autoreport = !autoreport;
             },
             y: () => {
               fishDriver.yammer();
@@ -105,10 +108,13 @@ function init() {
             console.log(`${v}: (${domain.min}:${domain.max}`);
         let s = fishDriver.state;
         let newState = fishDriver.update(v);
-        if(s == FishDriver.kGoingToSleep && newState == FishDriver.kWaiting) {
+        if(autoreport && s != newState) {
+          console.log(`${s} -> ${newState}`);          
+        }
+        if(s == FishDriver.kGoingToSleep && newState == FishDriver.kWaiting && autoreport) {
           dump();
         }
-    },5);
+    },kInterval);
 
     });
     board.on("exit",() => {

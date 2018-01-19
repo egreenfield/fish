@@ -35,8 +35,9 @@ function init() {
 
         // "blink" the led in 500ms on-off phase periods
             //TODO check motor pins.
-       m1 = new Motor(["GPIO13","GPIO5","GPIO6"] as any);
-    //   body = new Motor(["a8", "a7", "a6"] as any);
+  //head     m1 = new Motor(["GPIO13","GPIO5","GPIO6"] as any);
+  m1 = new Motor(["GPIO12","GPIO17","GPIO27"] as any);
+  //   body = new Motor(["a8", "a7", "a6"] as any);
   
     //TODO   AFMS.begin(64000);
 

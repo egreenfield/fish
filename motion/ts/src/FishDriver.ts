@@ -2,12 +2,12 @@ import { Board, Motor, Sensor } from "johnny-five";
 //-------------------------------------------------------------------------------------------
 // constants
 //-------------------------------------------------------------------------------------------
-//TODO check sound in pin
-const SoundInPin = "A0";
+
+// assumes baseline audio values is around 140
 
 const kNoiseThreshold = 200;
 const kSilenceThreshold = 175;
-const kReactivateThreshold = 130;
+const kReactivateThreshold = 200;
 const kJawTime = 200;
 const kTimeUntilFinishing = 100;
 const kTimeUntilSleep = 3000;
@@ -59,27 +59,34 @@ export class FishDriver {
         if (this.mouthPos == 1) return;
         this.mouthPos = 1;
         this.mouth.reverse(255);
-        //TODO is 255 the right number?
     }
 
     closeMouth() {
         if (this.mouthPos == 0) return;
         this.mouthPos = 0;
-        //TODO is 255 the right number?
         this.mouth.forward(255);
     }
 
     targetMouthTime:number = 0;
     moveMouth() {
-        let time: number = new Date().getTime() - this.talkStartTime;
-        let jawPos = time / kJawTime;
-        if (jawPos % 2 == 0) {
-            this.openMouth();
-        } else {
-            let partial = (time % kJawTime) * 10 / kJawTime;
-            if (partial > 5) this.closeMouth();
-            else this.openMouth();
+        let t= new Date().getTime();
+        if(t > this.targetMouthTime) {
+            if(this.mouthPos) {
+                this.closeMouth();
+            } else {
+                this.openMouth();
+            }
+            this.targetMouthTime = t + Math.random() * 200 + 50;
         }
+        // let time: number = new Date().getTime() - this.talkStartTime;
+        // let jawPos = time / kJawTime;
+        // if (jawPos % 2 == 0) {
+        //     this.openMouth();
+        // } else {
+        //     let partial = (time % kJawTime) * 10 / kJawTime;
+        //     if (partial > 5) this.closeMouth();
+        //     else this.openMouth();
+        // }
     }
 
     //-------------------------------------------------------------------------------------------
@@ -89,9 +96,8 @@ export class FishDriver {
     setHead(up: number) {
         if (this.headPos == up) return;
         this.headPos = up;
-        //TODO
-        // if (this.headPos) this.body.reverse(255);
-        // else this.body.forward(255);
+        if (this.headPos) this.body.forward(255);
+        else this.body.reverse(255);
     }
     yammer() {
         this.state = FishDriver.kYammering;
@@ -105,7 +111,7 @@ export class FishDriver {
     goToSleep() {
         this.mouth.forward(0);
         this.mouth.stop();
-        //TODO
+        this.body.forward(0);
         //this.body.stop();
     }
 
@@ -216,7 +222,6 @@ export class FishDriver {
         }
         if(this.state != lastState) {
             this.timeOfLastStateChange = (new Date()).getTime();
-            console.log(`${lastState} -> ${this.state}`);
         }
         return this.state;
     }
@@ -230,14 +235,13 @@ export class FishDriver {
     }
     constructor(board: Board) {
         this.mouth = new Motor(["GPIO13","GPIO5","GPIO6"] as any);
-//TODO        this.body = new Motor(["a8", "a7", "a6"] as any);
+        this.body = new Motor(["GPIO12","GPIO17","GPIO27"] as any);
 
         this.mouth.forward(0);
         this.mouth.stop();
 
-        //TODO
-        // this.body.forward(0);
-        // this.body.stop();
+        this.body.forward(0);
+        this.body.stop();
     }
 
 }
