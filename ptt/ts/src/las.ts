@@ -8,6 +8,7 @@ import { PollyTTS } from './modules/impl/PollyTTS';
 import { OSXSpeaker } from './modules/impl/OSXSpeaker';
 import { FFMpegTransformer } from './modules/impl/FFMpegTransformer';
 import { ListenAndSay } from './ListenAndSay';
+import { RPISpeaker } from './modules/impl/RPISpeaker';
 
 let tools = new Tools();
 
@@ -15,7 +16,7 @@ let session = new AWSSession();
 tools.listener = new SQSListener(tools,session);
 tools.fetcher = new PollyTTS(tools,session);
 tools.transformer = new FFMpegTransformer(tools);
-tools.speaker = new OSXSpeaker(tools);
+tools.speaker = new RPISpeaker(tools);// new OSXSpeaker(tools);
 
 tools.init();
 

@@ -5,14 +5,14 @@ import { Board, Motor, Sensor } from "johnny-five";
 
 // assumes baseline audio values is around 140
 
-const kNoiseThreshold = 200;
-const kSilenceThreshold = 175;
+const kNoiseThreshold = 160;
+const kSilenceThreshold = 200;
 const kReactivateThreshold = 200;
 const kJawTime = 200;
 const kTimeUntilFinishing = 100;
 const kTimeUntilSleep = 3000;
 const kRangeResetTrigger = 1000;
-
+const kTimeUntilWait = 500;
 const kPrintOut = 0;
 const kPrintInterval = 100;
 
@@ -33,10 +33,8 @@ export class FishDriver {
     talkStartTime = 0;
 
     state = FishDriver.kWaiting;
-    noiseCount = 0;
     silenceCount = 0;
     globalCount = 0;
-    lastHeardNoise = false;
     lastHeardSilence = false;
     timeOfLastStateChange = 0;
 
@@ -133,12 +131,6 @@ export class FishDriver {
 
         // check to see if the audio sensor is above the noise threshold
         let hearNoise = audioSensorValue > kNoiseThreshold;
-        if (this.lastHeardNoise == hearNoise) {
-            this.noiseCount++;
-        } else {
-            this.noiseCount = 1;
-            this.lastHeardNoise = hearNoise;
-        }
 
         // check to see if the audio sensor is below the silence threshold
         let hearSilence = audioSensorValue <= kSilenceThreshold;
@@ -179,14 +171,16 @@ export class FishDriver {
                 if (reactivateSound) {
                     this.state = FishDriver.kTalking;
                     // TODO change from count to timer, add timer callback
-                } else if (hearNoise == false && timeSinceLastStateChange > kTimeUntilSleep) {
+                } else if (timeSinceLastStateChange > kTimeUntilSleep) {
                     this.state = FishDriver.kGoingToSleep;
                 } else {
 //                    console.log(`${hearNoise}:${audioSensorValue}:${timeSinceLastStateChange}`);
                 }
                 break;
             case FishDriver.kGoingToSleep:
-                this.state = FishDriver.kWaiting;
+                if (timeSinceLastStateChange > kTimeUntilWait) {
+                    this.state = FishDriver.kWaiting;
+                }
                 break;
         }
 
@@ -196,7 +190,7 @@ export class FishDriver {
 
         if (kPrintOut && this.globalCount % kPrintInterval == 0) {
             console.log(
-                `s:(${this.state}) v:${audioSensorValue} | noise:${hearNoise}, ${this.noiseCount} | silence:${hearNoise}, ${this.silenceCount} | range:(${this.minV} - ${this.maxV}) - ${this.rangeCount}`
+                `s:(${this.state}) v:${audioSensorValue} | noise:${hearNoise} | silence:${hearNoise}, ${this.silenceCount} | range:(${this.minV} - ${this.maxV}) - ${this.rangeCount}`
             );
         }
 
@@ -235,7 +229,8 @@ export class FishDriver {
     }
     constructor(board: Board) {
         this.mouth = new Motor(["GPIO13","GPIO5","GPIO6"] as any);
-        this.body = new Motor(["GPIO12","GPIO17","GPIO27"] as any);
+//        this.body = new Motor(["GPIO12","GPIO17","GPIO27"] as any);
+        this.body = new Motor(["GPIO12","GPIO16","GPIO20"] as any);
 
         this.mouth.forward(0);
         this.mouth.stop();

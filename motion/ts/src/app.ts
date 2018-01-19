@@ -104,10 +104,10 @@ function init() {
         lastCallbackTime = t;
         domain.min = Math.min(v,domain.min);
         domain.max = Math.max(v,domain.max);
-        if(report)
-            console.log(`${v}: (${domain.min}:${domain.max}`);
         let s = fishDriver.state;
         let newState = fishDriver.update(v);
+        if(report)
+            console.log(`${v}: (${newState}:${domain.min}:${domain.max}`);
         if(autoreport && s != newState) {
           console.log(`${s} -> ${newState}`);          
         }
