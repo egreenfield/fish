@@ -4,18 +4,23 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build": "./node_modules/.bin/tsc --watch",
-    "start": "node dist/app.js",
+    "watch": "./node_modules/.bin/tsc --watch",
+    "build": "./node_modules/.bin/tsc",
+    "start": "./node_modules/.bin/nodemon dist/app.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "johnny-five": "^0.13.0"
+    "babar": "^0.2.0",
+    "cli-chart": "^0.3.1",
+    "johnny-five": "^0.13.0",
+    "raspi-io": "^8.1.0"
   },
   "devDependencies": {
     "@types/johnny-five": "0.0.32",
     "@types/node": "^9.3.0",
+    "nodemon": "^1.14.11",
     "typescript": "^2.6.2"
   }
 }

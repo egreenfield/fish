@@ -1,211 +1,118 @@
-import { Board, Motor, Sensor } from "johnny-five";
+import * as five from "johnny-five";
+import * as raspi from "raspi-io";
+import { Speaker } from "./Speaker";
+import { FishDriver } from "./FishDriver";
+import * as babar from "babar";
+import * as cc from "cli-chart";
+
 //-------------------------------------------------------------------------------------------
 // constants
 //-------------------------------------------------------------------------------------------
 //TODO check sound in pin
 const SoundInPin = "A0";
 
-const kNoiseThreshold = 275;
-const kSilenceThreshold = 150;
-const kReactivateThreshold = 275;
-const kJawTime = 200;
-const kSilenceTrigger = 20;
-const kSleepTrigger = 10000;
-const kRangeResetTrigger = 1000;
+let five_:any = five;
+let board: five.Board;
+let led:any;
 
-const kPrintOut = 0;
-const kPrintInterval = 100;
+let report:boolean = false;
 
-const waiting = 0;
-const talking = 1;
-const finishing = 2;
-const goingToSleep = 3;
-
-//-------------------------------------------------------------------------------------------
-// state
-//-------------------------------------------------------------------------------------------
-
-let mouthPos = 0;
-let headPos = 0;
-let tailPos = 0;
-let talkStartTime = 0;
-
-let state = waiting;
-let noiseCount = 0;
-let silenceCount = 0;
-let globalCount = 0;
-let lastHeardNoise = false;
-let lastHeardSilence = false;
-
-// the loop routine runs over and over again forever:
-let minV = 10000;
-let maxV = 0;
-let rangeCount = 0;
-
-let board: Board;
-let mouth: Motor;
-let body: Motor;
-let soundIn: Sensor;
-
-//-------------------------------------------------------------------------------------------
-// mouth control
-//-------------------------------------------------------------------------------------------
-
-function openMouth() {
-  if (mouthPos == 1) return;
-  mouthPos = 1;
-  mouth.reverse(255);
-  //TODO is 255 the right number?
-}
-
-function closeMouth() {
-  if (mouthPos == 0) return;
-  mouthPos = 0;
-  //TODO is 255 the right number?
-  mouth.forward(255);
-}
-
-function moveMouth() {
-  let time: number = new Date().getTime() - talkStartTime;
-  let jawPos = time / kJawTime;
-  if (jawPos % 2 == 0) {
-    openMouth();
-  } else {
-    let partial = (time % kJawTime) * 10 / kJawTime;
-    if (partial > 5) closeMouth();
-    else openMouth();
-  }
-}
-
-//-------------------------------------------------------------------------------------------
-// head/tail control
-//-------------------------------------------------------------------------------------------
-
-function setHead(up: number) {
-  if (headPos == up) return;
-  headPos = up;
-  //TODO is 255 the right number?
-  if (headPos) body.reverse(255);
-  else body.forward(255);
-}
-
-function goToSleep() {
-    mouth.stop();
-    body.stop();
-}
-
-function updateMotorsFromAudio(audioSensorValue: number) {
-  // increment the loop count
-  globalCount++;
-
-  // update min/max sensor values for diagnostics
-  rangeCount++;
-  if (rangeCount > kRangeResetTrigger) {
-    minV = 10000;
-    maxV = 0;
-    rangeCount = 0;
-  }
-  minV = Math.min(audioSensorValue, minV);
-  maxV = Math.max(audioSensorValue, maxV);
-
-  // check to see if the audio sensor is above the noise threshold
-  let hearNoise = audioSensorValue > kNoiseThreshold;
-  if (lastHeardNoise == hearNoise) {
-    noiseCount++;
-  } else {
-    noiseCount = 1;
-    lastHeardNoise = hearNoise;
-  }
-
-  // check to see if the audio sensor is below the silence threshold
-  let hearSilence = audioSensorValue <= kSilenceThreshold;
-  if (lastHeardSilence == hearSilence) {
-    silenceCount++;
-  } else {
-    silenceCount = 1;
-    lastHeardSilence = hearSilence;
-  }
-
-  // check to see if the audio sensor is above the reactivation threshold
-  let reactivateSound = audioSensorValue > kReactivateThreshold;
-
-  // now update state.
-  switch (state) {
-    case waiting:
-      if (hearNoise) {
-        talkStartTime = new Date().getTime();
-        state = talking;
-      }
-      break;
-    case talking:
-      // TODO change from count to timer, add timer callback
-      if (hearSilence && silenceCount > kSilenceTrigger) {
-        state = finishing;
-      }
-      break;
-    case finishing:
-      if (reactivateSound) {
-        state = talking;
-        // TODO change from count to timer, add timer callback
-      } else if (hearNoise == false && noiseCount > kSleepTrigger) {
-        state = goingToSleep;
-      }
-      break;
-    case goingToSleep:
-      state = waiting;
-      break;
-  }
-
-  if (kPrintOut && globalCount % kPrintInterval == 0) {
-    console.log(
-      `s:(${state}) v:${audioSensorValue} | noise:${hearNoise}, ${noiseCount} | silence:${hearNoise}, ${silenceCount} | range:(${minV} - ${maxV}) - ${rangeCount}`
-    );
-  }
-
-  // take action based on current state.
-  switch (state) {
-    case waiting:
-      break;
-    case talking:
-      setHead(1);
-      moveMouth();
-      break;
-    case finishing:
-      setHead(1);
-      closeMouth();
-      break;
-    case goingToSleep:
-      setHead(0);
-      closeMouth();
-      goToSleep();
-      break;
-  }
-}
+let domain:{min:number;max:number} = {min:Infinity,max:-Infinity};
+let speaker:Speaker;
+let fishDriver:FishDriver;
+let callbackCount = 0;
+let lastCallbackTime:number = -1;
+let callbackInterval = 0;
 
 //-------------------------------------------------------------------------------------------
 // startup
 //-------------------------------------------------------------------------------------------
 
+let colors = ['green','blue','yellow','red','cyan'];
+function chart(values:number[][],state:number,maxX:number) {
+  let color = (state < 0)? "yellow":colors[state];
+  console.log(babar(values.filter((v,i) => (v[2] == state || state < 0 || i == 0 || i == values.length-1)),{width:480,height:15,minX:0,maxX:maxX,color:color}));
+}
+function dump() {
+  let sampleRate = callbackInterval/callbackCount;
+  let newValues = fishDriver.lastRun.map((v,i) => [i*sampleRate/1000,v[1],v[0]]);
+  let maxX = newValues[newValues.length-1][0];
+  // chart(newValues,FishDriver.kWaiting,maxX);
+  // chart(newValues,FishDriver.kTalking,maxX);
+  // chart(newValues,FishDriver.kPausing,maxX);
+  // chart(newValues,FishDriver.kFinishing,maxX);
+  // chart(newValues,FishDriver.kGoingToSleep,maxX);
+  chart(newValues,-1,maxX);
+ // console.log(babar(fishDriver.lastRun.map((v,i) => [i*sampleRate/1000,v[1]]),{width:160,height:30}));
+
+  // let chart = new cc({
+  //   width: 160,
+  //   step: 1
+  // })
+  // fishDriver.lastRun.forEach(([state,value],i) => {
+  //   chart.addBar(value,colors[state]);
+  // });
+  // chart.draw();
+ 
+ // console.log(fishDriver.lastRun.map((v,i) => `(${Math.floor(i*sampleRate/1000*10)/10},${v[1]},${v[0]})`).join(""));
+  console.log(`${sampleRate} ms/interval`);
+}
 // the setup routine runs once when you press reset:
 function init() {
-    board = new Board({
-      //TODO: init with rpi info.
-    });
+    board = new five.Board({
+        io: new raspi()
+    } as any);
+
     board.on("ready", () => {
-      //TODO check motor pins.
-      mouth = new Motor(["a5", "a4", "a3"] as any);
-      body = new Motor(["a8", "a7", "a6"] as any);
-      soundIn = new Sensor(SoundInPin);
-      soundIn.on("change", () => {
-        updateMotorsFromAudio(soundIn.value);
-      });
-  
-      //TODO   AFMS.begin(64000);
-      mouth.forward(0);
-      mouth.stop();
-  
-      body.forward(0);
-      body.stop();
+        console.log("board ready");                
+        led = new five_.Led("GPIO25" as any);
+        led.blink(500);
+
+        board.repl.inject({
+            // Allow limited on/off control access to the
+            // Led instance from the REPL.
+            s: () => {
+                report = !report;
+            },
+            reset: () => {
+                domain = {min:Infinity,max:-Infinity}
+            },
+            stats: () => {
+              return dump();
+            },
+            p: () => {
+              fishDriver.stop();
+            },
+            y: () => {
+              fishDriver.yammer();
+            },
+        });
+
+    speaker = new Speaker(board);
+    fishDriver = new FishDriver(board);
+    setInterval(() => {
+        let v = speaker.value;
+        let t = (new Date()).getTime();
+        if(lastCallbackTime > 0) {
+          let delta = t - lastCallbackTime;
+          callbackInterval += delta;
+          callbackCount++;
+        }
+        lastCallbackTime = t;
+        domain.min = Math.min(v,domain.min);
+        domain.max = Math.max(v,domain.max);
+        if(report)
+            console.log(`${v}: (${domain.min}:${domain.max}`);
+        let s = fishDriver.state;
+        let newState = fishDriver.update(v);
+        if(s == FishDriver.kGoingToSleep && newState == FishDriver.kWaiting) {
+          dump();
+        }
+    },5);
+
+    });
+    board.on("exit",() => {
+        led.off();
     });
   }
 
