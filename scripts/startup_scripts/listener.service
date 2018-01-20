@@ -1,0 +1,10 @@
+[Unit]
+Desription=listener with systemd, respawn, after bluetooth
+After=bluetooth.target
+
+[Service]
+ExecStart=node /home/pi/dev/fish/scripts/start_listening.sh
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

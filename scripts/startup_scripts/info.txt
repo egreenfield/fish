@@ -1,0 +1,27 @@
+from https://stackoverflow.com/questions/37869423/run-a-script-after-bluetooth-is-configured-and-running-rasperry-pi-3
+
+
+The new init system for Debian 8 "Jessie" is systemd. The old way in Debian 7 "Wheezy" was Sysv with runlevels and /etc/inittab. A drawback of using crontab to run your program will be, if the script execution crashes, it dies forever. Restarting a script automatically if its ends is called "respawn".
+
+As you can see, the Bluetooth Service is running and prints that a "Target" is reached. To create your own service, which runs after bluetooth startup, and respawns with systemd just create a file in /etc/systemd/system/ i.e. my_program.service
+
+[Unit]
+Desription=my_program with systemd, respawn, after bluetooth
+After=bluetooth.target
+
+[Service]
+ExecStart=node /home/pi/workspace/my_program
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
+and activate it
+
+systemctl enable my_program.service
+reboot or start it manually
+
+systemctl daemon-reload
+systemctl start my_program.service
+If one kills the process or reboots, my_program will be restarted automatically some seconds later.
+
+
