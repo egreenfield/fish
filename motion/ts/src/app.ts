@@ -60,7 +60,8 @@ function dump() {
 // the setup routine runs once when you press reset:
 function init() {
     board = new five.Board({
-        io: new raspi()
+        io: new raspi(),
+	repl: false
     } as any);
 
     board.on("ready", () => {
@@ -68,9 +69,8 @@ function init() {
         led = new five_.Led("GPIO25" as any);
         led.blink(500);
 
+/*
         board.repl.inject({
-            // Allow limited on/off control access to the
-            // Led instance from the REPL.
             s: () => {
                 report = !report;
             },
@@ -90,7 +90,7 @@ function init() {
               fishDriver.yammer();
             },
         });
-
+*/
     speaker = new Speaker(board);
     fishDriver = new FishDriver(board);
     setInterval(() => {
