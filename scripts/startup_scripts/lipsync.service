@@ -1,0 +1,13 @@
+[Unit]
+Description=lip sync service that moves the fish to the audio input
+After=bluetooth.target
+
+[Service]
+ExecStart=/bin/bash /home/pi/dev/fish/scripts/service_lipsync.sh
+StandardOutput=null
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
+Alias=lipsync.service
+

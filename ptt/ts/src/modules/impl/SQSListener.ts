@@ -28,19 +28,16 @@ export class SQSListener implements Listener {
         if (this.queuePromise) {
             await this.queuePromise;
         }
-        console.log("starting receive");
         let result = await this.sqs.receiveMessage({
             WaitTimeSeconds:10,
             QueueUrl:this.queueUrl
         }).promise();
-        console.log("end receive");
     
         if(this.listening == false) {
             return;
         }
 
         let messages: SQS.Message[] = result.Messages || [];
-        console.log("received ",messages.length,"messages");
         if(messages.length) 
             await this.sqs.deleteMessageBatch( 
                 {

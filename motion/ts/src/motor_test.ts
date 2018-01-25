@@ -1,4 +1,4 @@
-import { Board, Motor, Sensor, Led } from "johnny-five";
+import { Board, Motor, Sensor, Led, Button } from "johnny-five";
 import * as raspi from "raspi-io";
 //-------------------------------------------------------------------------------------------
 // constants
@@ -10,6 +10,7 @@ let board: Board;
 let m1: Motor;
 let m2: Motor;
 let led:Led;
+let button:Button;
 
 
 
@@ -33,6 +34,11 @@ function init() {
     led = new Led("GPIO25" as any);
     led.on();
 
+
+    button = new Button({pin:"GPIO23" as any,isPulldown:true} as any);
+    button.on("change",() => {
+      console.log("button changed");
+    })
         // "blink" the led in 500ms on-off phase periods
             //TODO check motor pins.
   //head     m1 = new Motor(["GPIO13","GPIO5","GPIO6"] as any);

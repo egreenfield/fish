@@ -58,10 +58,10 @@ function dump() {
   console.log(`${sampleRate} ms/interval`);
 }
 // the setup routine runs once when you press reset:
-function init() {
+function init(interactive:boolean) {
     board = new five.Board({
         io: new raspi(),
-	repl: false
+	repl: (interactive == true)
     } as any);
 
     board.on("ready", () => {
@@ -69,7 +69,7 @@ function init() {
         led = new five_.Led("GPIO25" as any);
         led.blink(500);
 
-/*
+    if (interactive) {
         board.repl.inject({
             s: () => {
                 report = !report;
@@ -90,7 +90,7 @@ function init() {
               fishDriver.yammer();
             },
         });
-*/
+    }
     speaker = new Speaker(board);
     fishDriver = new FishDriver(board);
     setInterval(() => {
@@ -122,5 +122,14 @@ function init() {
     });
   }
 
-  
-init();
+import * as program from "commander";
+
+program
+.version('0.1.0')
+.option('-i, --interactive','use interactive repl')
+.parse(process.argv);
+
+console.log("argv is",process.argv);
+console.log("program is",program.interactive);
+
+init(program.interactive);

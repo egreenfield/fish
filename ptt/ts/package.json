@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build": "./node_modules/.bin/tsc --watch",
+    "build": "./node_modules/.bin/tsc",
+    "watch": "./node_modules/.bin/tsc --watch",
     "start": "node dist/las.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },

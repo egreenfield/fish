@@ -13,7 +13,7 @@ export class Tools {
         this.listener.init();
         this.fetcher.init();
         this.speaker.init();
-        this.transformer.init({volume:3,speed:1.3});
+        this.transformer.init();
     }
 }
 

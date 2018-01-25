@@ -1,0 +1,13 @@
+[Unit]
+Description=cloud listener service that generates speech from messages and sends them to audio out
+After=bluetooth.target
+
+[Service]
+ExecStartPre=/bin/sleep 30
+ExecStart=/bin/bash /home/pi/dev/fish/scripts/service_listen.sh
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
+Alias=cloudtalk.service
+

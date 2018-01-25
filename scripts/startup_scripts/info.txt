@@ -25,3 +25,6 @@ systemctl start my_program.service
 If one kills the process or reboots, my_program will be restarted automatically some seconds later.
 
 
+also, check:
+https://learn.adafruit.com/running-programs-automatically-on-your-tiny-computer/systemd-writing-and-enabling-a-service
+
