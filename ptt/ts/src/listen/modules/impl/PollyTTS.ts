@@ -19,12 +19,22 @@ export class PollyTTS {
 	
 	async fetchAudio(options:{message:string;output:string}) {
 		winston.info("saving message to %s",options.output);
+		let parts = options.message.split("&&");
+		let msg = parts.shift();
+		for(let i=0;i<parts.length;i++) {
+			if(i % 2 == 0)
+				msg += '<say-as interpret-as="expletive">';
+			else
+				msg += '</say-as>';
+			msg += parts[i];
+		}
+		winston.info(`getting audio for message: '${msg}'`);
 		let data = await this.polly.synthesizeSpeech({
 			OutputFormat:"mp3",
 			TextType:"ssml",
 			Text:`<speak><break time="1s"/>
 			<prosody rate="x-slow" volume="+150dB">
-			${options.message}
+			${msg}
 			</prosody>
 			<break time="1s"/></speak>`,
 			VoiceId:"Brian"}
