@@ -18,7 +18,7 @@ export class PollyTTS {
 	
 	async fetchAudio(options:{message:string;output:string}) {
 		console.log("saving message to",options.output);
-		let data = await this.polly.synthesizeSpeech({OutputFormat:"mp3",Text:options.message,VoiceId:"Matthew"}).promise()
+		let data = await this.polly.synthesizeSpeech({OutputFormat:"mp3",Text:options.message,VoiceId:"Brian"}).promise()
 		await writeFileP(options.output,data.AudioStream,{});
 		console.log("output file written");
 	}
