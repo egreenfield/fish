@@ -1,4 +1,7 @@
 import { Tools } from "./modules/api/Tools";
+import { Command } from "./modules/api/Message";
+import * as winston from "winston";
+
 
 export class ListenAndSay {
     private rawFilePath:string;
@@ -9,14 +12,14 @@ export class ListenAndSay {
         this.transformedFilePath = outputFolder+filePrefix+"transformedFile.mp3";
     }
     reportError(err:Error) {
-        console.log("Error reported:",err.message);
+        winston.info("Error reported:",err.message);
     }
     
-    async sayMessage(message:string) {
-        console.log("fetching speech");
-        await this.tools.fetcher.fetchAudio({message,output:this.rawFilePath});
+    async sayMessage(message:Command) {
+        winston.info("fetching speech");
+        await this.tools.fetcher.fetchAudio({message: message.arguments.text,output:this.rawFilePath});
         if (this.transformOnClient) {
-            console.log("transforming audio");
+            winston.info("transforming audio");
             await this.tools.transformer.transform({input:this.rawFilePath,outputFolder:this.outputFolder,output:this.transformedFilePath,prefix:this.filePrefix});		
             await this.tools.speaker.speak(this.transformedFilePath);
         } else {
@@ -27,21 +30,21 @@ export class ListenAndSay {
     async listenOnce() {
         let messages = await this.tools.listener.listenOnce();
         for(let i=0;i<messages.length;i++) {
-            console.log(`processing message ${messages[i]}`);
-            await this.sayMessage(messages[i]);
+            winston.info("received message",{message:messages[i]});
+            await this.sayMessage(messages[i].arguments.text);
         }
         return messages.length;
     }
     
-    async processMessages(err:Error,messages:string[]) {        
+    async processMessages(err:Error,messages:Command[]) {        
         if(err) {
             this.reportError(err);
         }
         try {
             for(let i=0;i<messages.length;i++) {
-                console.log(`****** processing message "${messages[i]}"`);
+                winston.info("received message",{message:messages[i]});
                 await this.sayMessage(messages[i]);
-                console.log("message processed");
+                //console.log("message processed");
             }
         } catch(e) {
             this.reportError(e as Error);

@@ -3,12 +3,13 @@ import { Listener } from "../api/Listener";
 import { AWSSession } from "./AWSSession";
 import { SQS, Response, AWSError } from "aws-sdk";
 import { setTimeout } from "timers";
+import { CommandType, Command } from '../api/Message';
 
 export class SQSListener implements Listener {
     private queuePromise: Promise<void>;
     private sqs : SQS;
     private queueUrl:string;
-    private callback:(err:Error,messages:string[])=>Promise<void>;
+    private callback:(err:Error,messages:Command[])=>Promise<void>;
     private listening = false;
 
 	constructor(public tools:Tools,public session:AWSSession) {
@@ -24,7 +25,7 @@ export class SQSListener implements Listener {
 	
 	}
 
-    private async retrieveMessageFromQueue() {
+    private async retrieveMessageFromQueue():Promise<Command[]> {
         if (this.queuePromise) {
             await this.queuePromise;
         }
@@ -44,7 +45,7 @@ export class SQSListener implements Listener {
                     QueueUrl: this.queueUrl, 
                     Entries: messages.map((m,i) => {return {Id:""+i,ReceiptHandle:m.ReceiptHandle}})
                 }).promise();
-        return messages.map(v => v.Body);
+        return messages.map(v => JSON.parse(v.Body));
     }
     
     private async checkForMessages() {
@@ -62,7 +63,7 @@ export class SQSListener implements Listener {
             },1);
         }
     }
-    public startListening(callback:(err:Error,messages:string[])=>Promise<void>) {
+    public startListening(callback:(err:Error,commands:Command[])=>Promise<void>) {
         if(this.listening)
             return;
         this.listening = true;
