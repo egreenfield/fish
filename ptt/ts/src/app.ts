@@ -11,6 +11,7 @@ import { ListenAndSay } from './listen/ListenAndSay';
 import { RPISpeaker } from './listen/modules/impl/RPISpeaker';
 import { CommandType } from "./listen/modules/api/Message";
 import * as winston from "winston";
+import { FishModule } from "./motion/FishModule";
 
 winston.configure({
     // format: winston.format.combine(
@@ -49,6 +50,8 @@ tools.init();
 
 let las = new ListenAndSay(tools,"../output/","main_");
 
+let fishModule = new FishModule();
+
 program
 .command('speak <message>')
 .description('say a string')
@@ -61,6 +64,7 @@ program
 .command('listen')
 .description('listen to the cloud for messages')
 .action((options:any) => {
+    fishModule.start({interactive:false});
     winston.info("starting standard listening mode");
     las.start();
 });
