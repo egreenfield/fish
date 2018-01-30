@@ -50,7 +50,10 @@ tools.init();
 
 let las = new ListenAndSay(tools,"../output/","main_");
 
-let fishModule = new FishModule();
+let fishModule:any;
+
+if(process.platform == "linux")
+    fishModule = new FishModule();
 
 program
 .command('speak <message>')
@@ -64,7 +67,8 @@ program
 .command('listen')
 .description('listen to the cloud for messages')
 .action((options:any) => {
-    fishModule.start({interactive:false});
+    if(fishModule)
+        fishModule.start({interactive:false});
     winston.info("starting standard listening mode");
     las.start();
 });
