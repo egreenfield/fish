@@ -1,10 +1,13 @@
 import * as five from "johnny-five";
-import * as raspi from "raspi-io";
 import { Speaker } from "./Speaker";
 import { FishDriver } from "./FishDriver";
 import * as babar from "babar";
 import * as cc from "cli-chart";
 
+let raspi:any;
+if(process.platform == "linux") {
+  raspi = require( "raspi-io" );
+}
 //-------------------------------------------------------------------------------------------
 // constants
 //-------------------------------------------------------------------------------------------
@@ -142,10 +145,16 @@ export class FishModule {
 
   start(options:{ interactive: boolean }) {
     this.interactive = options.interactive;
-    board = new five.Board({
-      io: new raspi(),
-      repl: this.interactive == true
-    } as any);
+    if(process.platform == "linux") {
+      board = new five.Board({
+        io: new raspi(),
+        repl: this.interactive == true
+      } as any);
+    } else {
+      board = new five.Board({
+        repl: this.interactive == true
+      } as any);      
+    }
 
     board.on("ready", this.initBoard.bind(this));
     board.on("exit", () => {

@@ -1,6 +1,6 @@
 import { Tools } from "./modules/api/Tools";
 import { Command } from "./modules/api/Message";
-import * as winston from "winston";
+import { logger } from "../logger";
 
 
 export class ListenAndSay {
@@ -12,14 +12,14 @@ export class ListenAndSay {
         this.transformedFilePath = outputFolder+filePrefix+"transformedFile.mp3";
     }
     reportError(err:Error) {
-        winston.info("Error reported:",err.message);
+        logger.info("Error reported:",err.message);
     }
     
     async sayMessage(message:Command) {
-        winston.info("fetching speech");
+        logger.info("fetching speech");
         await this.tools.fetcher.fetchAudio({message: message.arguments.text,output:this.rawFilePath});
         if (this.transformOnClient) {
-            winston.info("transforming audio");
+            logger.info("transforming audio");
             await this.tools.transformer.transform({input:this.rawFilePath,outputFolder:this.outputFolder,output:this.transformedFilePath,prefix:this.filePrefix});		
             await this.tools.speaker.speak(this.transformedFilePath);
         } else {
@@ -30,7 +30,7 @@ export class ListenAndSay {
     async listenOnce() {
         let messages = await this.tools.listener.listenOnce();
         for(let i=0;i<messages.length;i++) {
-            winston.info("received message",{message:messages[i]});
+            logger.info(`received message ${messages[i]}`);
             await this.sayMessage(messages[i].arguments.text);
         }
         return messages.length;
@@ -42,7 +42,7 @@ export class ListenAndSay {
         }
         try {
             for(let i=0;i<messages.length;i++) {
-                winston.info("received message",{message:messages[i]});
+                logger.info(`received message`,messages[i]);
                 await this.sayMessage(messages[i]);
                 //console.log("message processed");
             }

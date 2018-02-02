@@ -10,28 +10,14 @@ import { FFMpegTransformer } from './listen/modules/impl/FFMpegTransformer';
 import { ListenAndSay } from './listen/ListenAndSay';
 import { RPISpeaker } from './listen/modules/impl/RPISpeaker';
 import { CommandType } from "./listen/modules/api/Message";
-import * as winston from "winston";
+import { logger } from "./logger";
 import { FishModule } from "./motion/FishModule";
+import { Server } from "./server/server"
 
-winston.configure({
-    // format: winston.format.combine(
-    //     winston.format.splat(),
-    //     winston.format.simple()
-    //   ),
-        transports: [
-        //rotateTransport,
-        //new winston.transports.File({filename: '../logs/listener.log'}),
-        new winston.transports.File({
-            colorize: false,
-            timestamp: true,
-            filename: '../logs/listener.log.json',
-            maxsize: 100*1024,
-            json: false,
-            maxFiles: 5
-        }),
-        new winston.transports.Console({colorize:true,json:false})
-    ]
-})
+
+
+//---------------------------------------------------------------------------------------------------------------------------------------------------------------- 
+// set up listener process
 
 let tools = new Tools();
 
@@ -50,16 +36,28 @@ tools.init();
 
 let las = new ListenAndSay(tools,"../output/","main_");
 
+
+//---------------------------------------------------------------------------------------------------------------------------------------------------------------- 
+// set up motion process
+
 let fishModule:any;
 
 if(process.platform == "linux")
     fishModule = new FishModule();
 
+//---------------------------------------------------------------------------------------------------------------------------------------------------------------- 
+// set up web server
+let server:Server = new Server(las);
+server.init();
+
+//---------------------------------------------------------------------------------------------------------------------------------------------------------------- 
+// process command line
+    
 program
 .command('speak <message>')
 .description('say a string')
 .action((message:string,options:any) => {
-    winston.info("speaking message");
+    logger.info("speaking message");
     las.sayMessage({command:CommandType.speak, source:"<command line>", arguments:{text:message}});
 });
 
@@ -69,7 +67,7 @@ program
 .action((options:any) => {
     if(fishModule)
         fishModule.start({interactive:false});
-    winston.info("starting standard listening mode");
+    logger.info("starting standard listening mode");
     las.start();
 });
 

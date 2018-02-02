@@ -2,7 +2,7 @@
 import * as ffmpeg from 'fluent-ffmpeg';
 import { Transformer, TransformerOptions } from '../api/Transformer';
 import { Tools } from '../api/Tools';
-import * as winston from "winston";
+import { logger } from "../../../logger";
 
 const silenceFile = "../output/silence.ac3";
 
@@ -22,7 +22,7 @@ export class FFMpegTransformer implements Transformer {
 	async transform(options:{input:string,output:string,prefix:string,outputFolder:string}) {
 		let tempFile = options.outputFolder + options.prefix + "temp.mp3";
 		return new Promise<void>((resolve,reject) => {
-			winston.info("processing...")
+			logger.info("processing...")
 			var command = ffmpeg(options.input);
 			command
 			.audioFilters(`volume=${this.volume}`)
@@ -35,7 +35,7 @@ export class FFMpegTransformer implements Transformer {
 			})
 			.saveToFile(tempFile);
 		}).then(() => {
-			winston.info("adding silence...")
+			logger.info("adding silence...")
 			return new Promise<void>((resolve,reject) => {
 				var command = ffmpeg(silenceFile)
 					.addInput(tempFile)
