@@ -1,1 +1,1 @@
-declare module 'winston-logrotate';
+declare module 'winston';

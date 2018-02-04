@@ -7,3 +7,10 @@ export interface Command {
     source:string;
     arguments:any;
 }
+
+export interface SpeakCommand extends Command {
+    command: CommandType.speak;
+    arguments: {
+        text:string;        
+    }
+}

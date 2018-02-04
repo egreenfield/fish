@@ -3,7 +3,7 @@ import { Polly } from "aws-sdk";
 import { writeFile } from "fs";
 import { promisify } from "util";
 import { Tools } from "../api/Tools";
-import * as winston from "winston";
+import { logger } from "../../../logger";
 
 const writeFileP = promisify(writeFile);
 
@@ -18,7 +18,7 @@ export class PollyTTS {
 	init():void {}
 	
 	async fetchAudio(options:{message:string;output:string}) {
-		winston.info("saving message to %s",options.output);
+		logger.info(`saving message to ${options.output}`);
 		let parts = options.message.split("&&");
 		let msg = parts.shift();
 		for(let i=0;i<parts.length;i++) {
@@ -28,7 +28,7 @@ export class PollyTTS {
 				msg += '</say-as>';
 			msg += parts[i];
 		}
-		winston.info(`getting audio for message: '${msg}'`);
+		logger.info(`getting audio for message: '${msg}'`);
 		let data = await this.polly.synthesizeSpeech({
 			OutputFormat:"mp3",
 			TextType:"ssml",
@@ -40,6 +40,6 @@ export class PollyTTS {
 			VoiceId:"Brian"}
 		).promise();
 		await writeFileP(options.output,data.AudioStream,{});
-		winston.info("output file written");
+		logger.info("output file written");
 	}
 }
