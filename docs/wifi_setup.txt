@@ -1,0 +1,4 @@
+https://raspberrypi.stackexchange.com/questions/44184/switch-between-ap-and-client-mode
+https://github.com/davidflanagan/wifi-setup
+
+
