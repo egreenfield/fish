@@ -1,6 +1,6 @@
 import { Tools } from "./modules/api/Tools";
 import { Command } from "./modules/api/Message";
-import { logger } from "../logger";
+import { logger, auditLog } from "../logger";
 
 
 export class ListenAndSay {
@@ -12,7 +12,7 @@ export class ListenAndSay {
         this.transformedFilePath = outputFolder+filePrefix+"transformedFile.mp3";
     }
     reportError(err:Error) {
-        logger.info("Error reported:",err.message);
+        logger.info(`Error reported: ${err.message}`,err);
     }
     
     async sayMessage(message:Command) {
@@ -43,6 +43,7 @@ export class ListenAndSay {
         try {
             for(let i=0;i<messages.length;i++) {
                 logger.info(`received message`,messages[i]);
+                auditLog.info(`received message`,messages[i]);
                 await this.sayMessage(messages[i]);
                 //console.log("message processed");
             }

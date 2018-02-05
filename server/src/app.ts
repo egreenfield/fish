@@ -34,7 +34,7 @@ if (process.platform == "darwin") {
 
 tools.init();
 
-let las = new ListenAndSay(tools,"../output/","main_");
+let las = new ListenAndSay(tools,"output/","main_");
 
 
 //---------------------------------------------------------------------------------------------------------------------------------------------------------------- 

@@ -1,4 +1,4 @@
-#!/bin/sh 
+#!/bin/bash 
 if [[ -z "$TMUX" ]] ;then
 	tmux new-session -s "fish" -d -c "~/dev/fish/"
 fi
@@ -7,9 +7,9 @@ echo $DIR
 tmux set pane-border-status top
 tmux rename-window "fish-dev"
 # tmux setw remain-on-exit on
-tmux split-window -h -c ${DIR}/../ptt/ts
-tmux split-window -v -c ${DIR}/../ptt/ts 'printf "\033]2;%s\033\\" "client compilation";npm run watch'
-tmux respawn-pane -k -t .bottom-left -c ${DIR}/../ptt/ts  'printf "\033]2;%s\033\\" "listener";nodemon dist/app.js listen'
+tmux split-window -h -c ${DIR}/../server
+tmux split-window -v -c ${DIR}/../server 'printf "\033]2;%s\033\\" "client compilation";npm run watch'
+tmux respawn-pane -k -t .bottom-left -c ${DIR}/..  'printf "\033]2;%s\033\\" "listener";sudo /home/pi/dev/fish/scripts/service_listen.sh'
 if [[ -z "$TMUX" ]] ;then
 	tmux -2 attach-session -d 
 fi

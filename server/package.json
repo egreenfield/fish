@@ -1,24 +1,36 @@
 {
-  "name": "motion",
+  "name": "ptt",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
-    "watch": "./node_modules/.bin/tsc --watch",
     "build": "./node_modules/.bin/tsc",
-    "start": "node dist/app.js",
+    "watch": "./node_modules/.bin/tsc --watch",
+    "start": "node dist/las.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@types/express": "^4.11.0",
+    "aws-sdk": "^2.179.0",
     "babar": "^0.2.0",
+    "body-parser": "^1.18.2",
     "cli-chart": "^0.3.1",
     "commander": "^2.13.0",
+    "create-react-app": "^1.5.1",
+    "express": "^4.16.2",
+    "fluent-ffmpeg": "^2.1.2",
     "johnny-five": "^0.13.0",
+    "winston": "^3.0.0-rc1"
+  },
+  "optionalDependencies": {
     "raspi-io": "^8.1.0"
   },
   "devDependencies": {
+    "@types/body-parser": "^1.16.8",
+    "@types/commander": "^2.12.2",
+    "@types/fluent-ffmpeg": "^2.1.6",
     "@types/johnny-five": "0.0.32",
     "@types/node": "^9.3.0",
     "nodemon": "^1.14.11",

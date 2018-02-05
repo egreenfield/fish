@@ -32,13 +32,32 @@ export const logger = winston.createLogger({
       ),          
     }),
     new winston.transports.File({
-      filename: '../../logs/listener.log',
+      filename: 'logs/listener.log',
       json: true,
     })
 //    new winston.transports.File({ filename: 'combined.log' })
   ]
 });
 
+export const auditLog = winston.createLogger({
+    level: 'info',
+    // format: combine(
+    //   timestamp(),
+    //   myFormat
+    // ),
+    transports: [
+      new winston.transports.Console({
+        formatter: combine(
+          timestamp(),
+          myFormat
+        ),          
+      }),
+      new winston.transports.File({
+        filename: 'logs/audit.log',
+        json: true,
+      })
+    ]
+  });
 
 
 // ----------------------------------------------------------------------

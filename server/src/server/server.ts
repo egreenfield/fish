@@ -3,7 +3,7 @@ import { promisify } from "util";
 import { exec } from "child_process";
 import { Request, Response} from "express";
 import * as bodyParser from "body-parser";
-import { logger } from "../logger";
+import { logger, auditLog } from "../logger";
 import { ListenAndSay } from "../listen/ListenAndSay";
 import { SpeakCommand, CommandType } from "../listen/modules/api/Message";
 
@@ -19,16 +19,16 @@ export class Server {
     }
 
     async getMessages(req:Request,res:Response) {
-        logger.query({
-            limit:200,
+        auditLog.query({
+            limit:50,
             start:0,
             fields: ["source","command","arguments"]
         },(err:any,results:any) => {
 
             let messages:any[] = results.file.filter((l:any) => l.command == "speak").map((l:any) => {return {source:l.source,text:l.arguments.text}});
-            let body = messages.map(v => JSON.stringify(v)).join("<br>");
-            res.send(body);
-            //res.send(JSON.stringify(messages));
+//            let body = messages.map(v => JSON.stringify(v)).join("<br>");
+//            res.send(body);
+            res.send(JSON.stringify(messages));
         })
     }
 

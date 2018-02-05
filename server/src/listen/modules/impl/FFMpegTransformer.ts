@@ -4,7 +4,7 @@ import { Transformer, TransformerOptions } from '../api/Transformer';
 import { Tools } from '../api/Tools';
 import { logger } from "../../../logger";
 
-const silenceFile = "../output/silence.ac3";
+const silenceFile = "output/silence.ac3";
 
 export class FFMpegTransformer implements Transformer {
 
