@@ -44,6 +44,7 @@ body {
     "navBar content"
 }
 .contentArea {
+  padding: 20px;
   grid-area: content;
 }
 
@@ -54,8 +55,8 @@ body {
 }
 
 .voiceConfigPanel {
-  padding: 20px;
   max-width:300px;
+  text-align: left;
 }
 /*
 .ms-Nav-compositeLink {
@@ -66,3 +67,7 @@ body {
   background-color: #C7E0F4;
 }
 */
+.compactPanel {
+  max-width:300px;
+  text-align: left;
+}

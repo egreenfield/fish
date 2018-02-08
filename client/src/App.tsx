@@ -9,6 +9,7 @@ import * as PropTypes from "prop-types";
 import { FishModel } from './FishModel';
 import { LandingPage } from './LandingPage';
 import { TopBar } from "./TopBar";
+import { GeneralPage } from './GeneralPage';
 export interface AppContext {
   model:FishModel;
 }
@@ -36,6 +37,7 @@ class App extends React.Component {
           <NavPanel />
           <div className="contentArea">
           <Route path="/" exact render={()=><LandingPage model={this.model}/>} />
+          <Route path="/general" exact render={()=><GeneralPage model={this.model}/>} />
           <Route path="/audit" render={()=><AuditTrail model={this.model}/>} />
           <Route path="/voice" exact render={()=><VoiceConfigPage model={this.model}/>} />
           </div>

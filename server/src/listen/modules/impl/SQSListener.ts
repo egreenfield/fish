@@ -57,10 +57,15 @@ export class SQSListener implements Listener {
 
     private  setNextTimeout() {
         if(this.listening) {
-            setTimeout(async () => {
-                await this.checkForMessages();
-                this.setNextTimeout();
-            },1);
+            if(this.tools.configMgr.config.listening) {
+                setTimeout(async () => {
+                    await this.checkForMessages();
+                    this.setNextTimeout();
+                },1);
+            } else {
+                setTimeout(() => this.setNextTimeout(),10000);                
+            }
+
         }
     }
     public startListening(callback:(err:Error,commands:Command[])=>Promise<void>) {
