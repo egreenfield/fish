@@ -83,6 +83,8 @@ export class Server {
         this.app.post('/api/postMessage',this.postMessage.bind(this));
         this.app.get('/api/resetBluetooth',this.resetBluetooth.bind(this));
         
+        this.app.use(express.static('../client/build'))
+
         this.app.listen(8080,() => logger.info("WebServer started on port 8080"));
     }
 }
