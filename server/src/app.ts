@@ -65,7 +65,7 @@ async function init() {
     .description('say a string')
     .action((message:string,options:any) => {
         logger.info("speaking message");
-        las.sayMessage({command:CommandType.speak, source:"<command line>", arguments:{text:message}});
+        las.sayMessage({command:CommandType.speak, source:"<command line>", arguments:{text:message}, sent: new Date(), received: new Date()});
     });
 
     program

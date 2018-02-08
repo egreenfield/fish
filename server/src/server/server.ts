@@ -64,6 +64,8 @@ export class Server {
         let command:SpeakCommand = {
             command: CommandType.speak,
             source: "web",
+            sent: new Date(),
+            received: new Date(),
             arguments: {
                 text: req.body.text
             }

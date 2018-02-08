@@ -2,11 +2,11 @@
   "name": "ptt",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "dist/app.js",
   "scripts": {
     "build": "./node_modules/.bin/tsc",
     "watch": "./node_modules/.bin/tsc --watch",
-    "start": "node dist/las.js",
+    "start": "nodemon dist/app.js listen",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",

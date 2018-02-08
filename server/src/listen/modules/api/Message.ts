@@ -5,6 +5,8 @@ export enum CommandType {
 export interface Command {    
     command:CommandType;
     source:string;
+    sent:Date;
+    received:Date;
     arguments:any;
 }
 
