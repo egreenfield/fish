@@ -6,6 +6,7 @@ import * as bodyParser from "body-parser";
 import { logger, auditLog } from "../logger";
 import { ListenAndSay } from "../listen/ListenAndSay";
 import { SpeakCommand, CommandType } from "../listen/modules/api/Message";
+import { ConfigMgr } from "../ServerConfig";
 
 const execP = promisify(exec);
 
@@ -14,7 +15,7 @@ function sleep(ms:number) {
 }
 export class Server {
     app:express.Express;
-    constructor(private listener:ListenAndSay) {
+    constructor(private listener:ListenAndSay,public configMgr:ConfigMgr) {
 
     }
 
@@ -31,7 +32,9 @@ export class Server {
             res.send(JSON.stringify(messages));
         })
     }
-
+    async getConfig(req:Request,res:Response) {
+        res.send(JSON.stringify(this.configMgr.config));        
+    }
     
     async resetBluetooth(req:Request,res:Response) {
         logger.info("resetting bluetooth");        
@@ -50,7 +53,12 @@ export class Server {
         res.end();
 
     }
-
+    async putConfig(req:Request,res:Response) {
+        logger.info(`received post config request`,{body: req.body});
+        let newConfig = req.body;
+        await this.configMgr.update(newConfig);
+        res.send("Updated.");        
+    }
     async postMessage(req:Request,res:Response) {
         logger.info(`received postMessage request from web`,{body: req.body});
         let command:SpeakCommand = {
@@ -70,6 +78,8 @@ export class Server {
         this.app.use(bodyParser.urlencoded({extended:true}));
 
         this.app.get('/api/messages',this.getMessages.bind(this));
+        this.app.get('/api/config',this.getConfig.bind(this));
+        this.app.post('/api/config',this.putConfig.bind(this));
         this.app.post('/api/postMessage',this.postMessage.bind(this));
         this.app.get('/api/resetBluetooth',this.resetBluetooth.bind(this));
         

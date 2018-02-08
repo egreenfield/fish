@@ -18,7 +18,10 @@ export class PollyTTS {
 	init():void {}
 	
 	async fetchAudio(options:{message:string;output:string}) {
+		let {defaultVoice: {name,speed,pitch,volume}} = this.tools.configMgr.config;
+
 		logger.info(`saving message to ${options.output}`);
+		logger.info(`speaking with: ${JSON.stringify(this.tools.configMgr.config.defaultVoice)}`);
 		let parts = options.message.split("&&");
 		let msg = parts.shift();
 		for(let i=0;i<parts.length;i++) {
@@ -33,11 +36,11 @@ export class PollyTTS {
 			OutputFormat:"mp3",
 			TextType:"ssml",
 			Text:`<speak><break time="1s"/>
-			<prosody rate="x-slow" volume="+150dB">
+			<prosody rate="${speed}" volume="${volume}" pitch="${pitch}">
 			${msg}
 			</prosody>
 			<break time="1s"/></speak>`,
-			VoiceId:"Brian"}
+			VoiceId:name}
 		).promise();
 		await writeFileP(options.output,data.AudioStream,{});
 		logger.info("output file written");

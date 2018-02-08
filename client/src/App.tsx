@@ -1,19 +1,45 @@
+
 import * as React from 'react';
 import './App.css';
-
-const logo = require('./logo.svg');
+import { NavPanel } from './NavPanel';
+import { Route } from 'react-router-dom'
+import { AuditTrail } from './AuditTrail';
+import { VoiceConfigPage } from "./VoiceConfigPage";
+import * as PropTypes from "prop-types";
+import { FishModel } from './FishModel';
+import { LandingPage } from './LandingPage';
+import { TopBar } from "./TopBar";
+export interface AppContext {
+  model:FishModel;
+}
 
 class App extends React.Component {
-  render() {
+  model:FishModel = new FishModel();
+
+  static childContextTypes = {
+    model: PropTypes.object
+  }
+
+  getChildContext():AppContext {
+    return {model: this.model};
+  }
+
+
+    
+  public render() {
     return (
-      <div className="App">
-        <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <h1 className="App-title">Welcome to React</h1>
-        </header>
-        <p className="App-intro">
-          To get started, edit <code>src/App.tsx</code> and save to reload.
-        </p>
+      <div className="app ms-fabric" >
+        <div className="top">
+          <TopBar model={this.model} />
+        </div>
+        <div className="bottom">
+          <NavPanel />
+          <div className="contentArea">
+          <Route path="/" exact render={()=><LandingPage model={this.model}/>} />
+          <Route path="/audit" render={()=><AuditTrail model={this.model}/>} />
+          <Route path="/voice" exact render={()=><VoiceConfigPage model={this.model}/>} />
+          </div>
+        </div>
       </div>
     );
   }

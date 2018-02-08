@@ -8,7 +8,7 @@
             "type": "node",
             "request": "launch",
             "name": "Launch Program",
-            "program": "${workspaceFolder}/dist/las.js",
+            "program": "${workspaceFolder}/dist/app.js",
             "sourceMaps":true,
             "outFiles": [
                 "${workspaceFolder}/dist/**/*.js"
