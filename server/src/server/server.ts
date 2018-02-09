@@ -23,10 +23,10 @@ export class Server {
         auditLog.query({
             limit:50,
             start:0,
-            fields: ["source","command","arguments"]
+            fields: ["source","command","arguments","received"]
         },(err:any,results:any) => {
 
-            let messages:any[] = results.file.filter((l:any) => l.command == "speak").map((l:any) => {return {source:l.source,text:l.arguments.text}});
+            let messages:any[] = results.file.filter((l:any) => l.command == "speak").map((l:any) => {return {source:l.source,text:l.arguments.text,  received:l.received}});
 //            let body = messages.map(v => JSON.stringify(v)).join("<br>");
 //            res.send(body);
             res.send(JSON.stringify(messages));
