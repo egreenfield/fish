@@ -45,7 +45,11 @@ export class SQSListener implements Listener {
                     QueueUrl: this.queueUrl, 
                     Entries: messages.map((m,i) => {return {Id:""+i,ReceiptHandle:m.ReceiptHandle}})
                 }).promise();
-        return messages.map(v => ({...JSON.parse(v.Body), sent:new Date(v.Attributes["SentTimestamp"]), received: new Date()  }));
+        return messages.map(v => {
+            let result = {...JSON.parse(v.Body), received: new Date()  };
+            result.sent = new Date(result.sent);
+            return result;
+        });
     }
     
     private async checkForMessages() {

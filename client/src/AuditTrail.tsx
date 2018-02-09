@@ -17,7 +17,7 @@ const columns: IColumn[] = [
   {
     key: 'column1',
     name: 'Time',
-    fieldName: 'name',
+    fieldName: 'received',
     minWidth: 100,
     maxWidth: 200,
     isResizable: false,
