@@ -21,7 +21,9 @@ export class NavPanel extends React.Component<NavPanelProps> {
       [
         { name: 'Home',url: '/',},
         { name: 'General',url: '/general',},
+        { name: 'Users',url: '/users',},
         { name: 'Message Log', url: '/audit' },
+        { name: 'Log', url: '/log' },
         { name: "Voice Options", url: '/voice'}
       ]
     }

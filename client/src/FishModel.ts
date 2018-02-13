@@ -21,7 +21,7 @@ export interface FishConfig {
     sleepTime:number;
     wakeTime:number;
     defaultVoice: VoiceConfig;
-    voiceRules: VoiceRule[];
+    users:User[];
 }
 
 export interface AuditRecord {
@@ -29,7 +29,17 @@ export interface AuditRecord {
     message:string;
     timestamp:Date;
 }
-
+export enum ActiveState {
+    never,
+    always,
+    present
+}
+export interface User {
+    name:string;
+    device:string;
+    active:ActiveState;
+    queue:string;
+}
 
 function createDefaultConfig():FishConfig {
     return {
@@ -43,7 +53,7 @@ function createDefaultConfig():FishConfig {
             pitch: "medium",
             volume: "medium"
         },
-        voiceRules: []
+        users:[]
     }
 }
 

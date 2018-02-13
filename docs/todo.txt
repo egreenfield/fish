@@ -1,0 +1,11 @@
+- proximity detection
+- wifi setup
+- sleep times
+- multi-sender voices
+- multi-user
+	- proximity detection
+	- phone number/queue
+- scheduled messages
+- trivia, insults, etc.
+
+- persistent client side queue - https://www.npmjs.com/package/better-queue

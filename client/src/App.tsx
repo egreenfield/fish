@@ -10,6 +10,7 @@ import { FishModel } from './FishModel';
 import { LandingPage } from './LandingPage';
 import { TopBar } from "./TopBar";
 import { GeneralPage } from './GeneralPage';
+import { UserPage } from 'src/UserPage';
 export interface AppContext {
   model:FishModel;
 }
@@ -40,6 +41,7 @@ class App extends React.Component {
           <Route path="/general" exact render={()=><GeneralPage model={this.model}/>} />
           <Route path="/audit" render={()=><AuditTrail model={this.model}/>} />
           <Route path="/voice" exact render={()=><VoiceConfigPage model={this.model}/>} />
+          <Route path="/users" exact render={()=><UserPage model={this.model}/>} />
           </div>
         </div>
       </div>
